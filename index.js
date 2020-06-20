@@ -12,9 +12,9 @@ app.get('/signup', (req, res) => {
 	res.send(`
 	<div class="">
         <form action="" method="POST">
-            <input name="email" type="email" placeholder="Enter Email" id="">
-            <input name="pass" type="password" placeholder="Password" id="">
-            <input name="confirmPass" type="password" placeholder="Confirm password" id="">
+            <input name="email" type="email" placeholder="Enter Email" id="" required>
+            <input name="pass" type="password" placeholder="Password" id="" required>
+            <input name="confirmPass" type="password" placeholder="Confirm password" id="" required>
             <button type="submit">Sign Up</button>
         </form>
     </div>
@@ -39,7 +39,7 @@ app.post('/signup', async (req, res) => {
 	res.send('Account initiated');
 });
 
-app.get('/logout', async (req, res) => {
+app.get('/signout', async (req, res) => {
 	req.session = null;
 	res.send('You are logged out!');
 });
@@ -61,7 +61,9 @@ app.post('/signin', async (req, res) => {
 	const user = await userRepo.getOneBy({ email });
 	if (!user) {
 		return res.send('Invalid email');
-	} else if (user.password !== pass) {
+	}
+	const passwordMatch = await userRepo.comparePass(user.password, pass);
+	if (!passwordMatch) {
 		return res.send('Invalid Password!');
 	}
 	req.session.userId = user.id;
